@@ -1,4 +1,4 @@
-# Gun Showdown
+# MP Battle Arena
 
 A 3D blocky shooter that runs in any web browser. Play solo against bots, or play **online with friends**. There's no server to install and it doesn't need Claude.
 

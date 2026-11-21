@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gun Showdown</title>
+<title>MP Battle Arena</title>
 <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0f14;--fg:#f2f5f8;--acc:#ffb020;--panel:rgba(10,14,20,.65);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -49,7 +49,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:14px "C
 <div id="hud" class="p">HEALTH<div id="hpb"><div id="hp"></div></div><small id="q" style="opacity:.6">Q: quality Full</small></div>
 <div id="wp" class="p"></div>
 <div id="tm" class="p">3:00</div>
-<div id="menu"><h1 id="mh">GUN SHOWDOWN</h1>
+<div id="menu"><h1 id="mh">MP BATTLE ARENA</h1>
 <p id="md">Pick one gun and keep it for the whole 3 minute round. Most kills wins!</p>
 <p>Online: one person hosts and sends the link, everyone else clicks it to join. Works across the internet, no install.</p>
 <p>WASD move · Space jump · Mouse look (or arrow keys) · Click shoot · Hold right-click to aim (not pistols, revolver or knife) · Q change quality · Esc pause</p>
@@ -222,7 +222,7 @@ else if(m.t==='msg')feed(m.s);
 else if(m.t==='new'){state='menu';P.al=false;P.k=0;showMenu('pick','NEW ROUND','Pick your gun and keep it until the round ends.')}}
 // ONLINE (peer-to-peer, no server): the host's browser runs the game server, friends connect to it with PeerJS/WebRTC
 let peer=null,conn=null,HOST=false,CODE='';
-const PFX='gunshowdown-v1-',ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]}};
+const PFX='mpbattlearena-v1-',ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]}};
 const askName=()=>((prompt('Your name?',localStorage.gsName||'Player')||'Player').replace(/[<>&]/g,'').slice(0,12)||'Player');
 function inviteLink(){return location.origin+location.pathname+'?room='+CODE}
 function showRoom(){const r=$('room');r.style.display='block';r.innerHTML='Room <b style="color:var(--acc)">'+CODE+'</b> · click to copy invite link'}
@@ -256,13 +256,13 @@ peer.on('connection',c=>{const id=sNext++;links[id]=c;
 c.on('data',m=>srvMsg(id,m));
 c.on('close',()=>{const p=SP[id];delete links[id];delete SP[id];if(p)feed(p.name+' left')});
 c.on('error',()=>{})});
-peer.on('error',e=>{if(e.type==='unavailable-id'){peer.destroy();hostGame()}else if(!NET){alert('Could not start the room ('+e.type+'). Try again.');showMenu('mode','GUN SHOWDOWN','Choose a mode')}});
+peer.on('error',e=>{if(e.type==='unavailable-id'){peer.destroy();hostGame()}else if(!NET){alert('Could not start the room ('+e.type+'). Try again.');showMenu('mode','MP BATTLE ARENA','Choose a mode')}});
 peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}})}
 function joinGame(code){if(!window.Peer){alert('Could not load the online library. Check your internet connection.');return}
 code=(code||prompt('Room code from your friend?','')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(!code)return;
 const n=askName();CODE=code;showMenu('wait','CONNECTING...','Joining room '+code+'...');
 peer=new Peer(ICE);
-const fail=()=>{if(!NET){alert('Could not join room '+code+'. Check the code and make sure the host still has the game open.');showMenu('mode','GUN SHOWDOWN','Choose a mode')}};
+const fail=()=>{if(!NET){alert('Could not join room '+code+'. Check the code and make sure the host still has the game open.');showMenu('mode','MP BATTLE ARENA','Choose a mode')}};
 const tmo=setTimeout(()=>{if(!NET){try{peer.destroy()}catch(e){}fail()}},15000);
 peer.on('error',e=>{clearTimeout(tmo);fail()});
 peer.on('open',()=>{conn=peer.connect(PFX+code,{reliable:true,serialization:'json'});
@@ -290,10 +290,10 @@ R.render(scene,cam)}
 $('picks').innerHTML=W.map((w,i)=>'<div class="pk" data-i="'+i+'"><b>'+w.n+'</b><br><small>Damage '+w.d*w.p+'<br>'+(w.a?'Full-auto':'Semi-auto')+(ADS[i]?' · ADS':'')+'</small></div>').join('');
 $('mbot').onclick=()=>showMenu('pick','VS BOTS','Pick one gun and keep it for the whole 3 minute round. Most kills wins!');
 $('mhost').onclick=hostGame;$('mjoin').onclick=()=>joinGame();
-$('back').onclick=()=>showMenu('mode','GUN SHOWDOWN','Choose a mode');
+$('back').onclick=()=>showMenu('mode','MP BATTLE ARENA','Choose a mode');
 const dr=()=>{$('diff').innerHTML=DF.map((d,i)=>'<div class="df'+(i===dif?' on':'')+'" data-i="'+i+'">'+d.n+'</div>').join('')};dr();
 $('diff').onclick=e=>{const t=e.target.closest('.df');if(t){dif=+t.dataset.i;dr()}};
-showMenu('mode','GUN SHOWDOWN','Choose a mode');
+showMenu('mode','MP BATTLE ARENA','Choose a mode');
 resetAll(0);ents.forEach(e=>{if(e.bot)e.m.position.copy(e.p)});requestAnimationFrame(loop);
 const qr=new URLSearchParams(location.search).get('room');if(qr){$('md').textContent='You were invited to room '+qr.toUpperCase()+'.';$('mjoin').innerHTML='JOIN ROOM '+qr.toUpperCase().replace(/[^A-Z0-9]/g,'')+'<small>Click to join your friend</small>';$('mjoin').onclick=()=>joinGame(qr)}
 </script></body></html>
